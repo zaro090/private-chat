@@ -160,7 +160,7 @@
             flex-direction: column;
             gap: 8px;
             background: #0f172a;
-            padding-bottom: 20px;
+            padding-bottom: 80px;
         }
         .msg {
             max-width: 82%;
@@ -271,7 +271,7 @@
             padding: 12px 16px 20px;
             background: #1e293b;
             border-top: 1px solid #2d3a4a;
-            padding-bottom: max(24px, env(safe-area-inset-bottom));
+            padding-bottom: max(60px, env(safe-area-inset-bottom));
             align-items: center;
         }
         #inputArea .input-wrapper {
@@ -435,11 +435,12 @@
             }
             #messages {
                 padding: 12px 12px 20px;
-                padding-bottom: 20px;
+                padding-bottom: 80px;
             }
             #inputArea {
                 padding: 10px 12px 20px;
                 gap: 8px;
+                padding-bottom: max(60px, env(safe-area-inset-bottom));
             }
             #inputArea .input-wrapper {
                 min-width: 150px;
@@ -609,7 +610,8 @@
 
         function loadMessages() {
             messagesRef.off();
-            messagesRef.limitToLast(50).on('child_added', function(snapshot) {
+            // بارگذاری همه پیام‌ها (بدون محدودیت)
+            messagesRef.on('child_added', function(snapshot) {
                 const data = snapshot.val();
                 if (!data) return;
                 if (data.selfDestruct && data.selfDestruct > 0) {
@@ -831,7 +833,7 @@
             showToast('🚪 خارج شدی'); });
 
         loadSavedUser();
-        console.log('💬 گپ خصوصی با منوی همبرگر آماده است!');
+        console.log('💬 گپ خصوصی با نمایش همه پیام‌ها آماده است!');
         console.log('🔑 کد اتاق: FAMILY2025');
     </script>
 </body>
