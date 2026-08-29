@@ -79,6 +79,7 @@
             max-width: 78%; padding: 10px 14px; border-radius: 18px;
             word-wrap: break-word; font-size: 0.9rem; line-height: 1.6;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            position: relative;
         }
         .msg.me {
             align-self: flex-end;
@@ -100,12 +101,44 @@
             margin-top: 4px; text-align: left;
         }
         .msg.me .time { color: #bfdbfe; opacity: 0.8; }
+        .msg .reactions {
+            display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;
+        }
+        .msg .reactions span {
+            background: #2d3a4a; padding: 2px 6px; border-radius: 12px;
+            font-size: 0.7rem; cursor: pointer; transition: 0.1s;
+        }
+        .msg .reactions span:hover { transform: scale(1.1); }
+        .msg .reply-to {
+            font-size: 0.7rem; color: #94a3b8; margin-bottom: 4px;
+            padding: 4px 8px; background: rgba(255,255,255,0.05);
+            border-radius: 8px; border-right: 2px solid #3b82f6;
+        }
+        .msg .edit-indicator {
+            font-size: 0.6rem; color: #94a3b8; margin-right: 4px;
+        }
+        .msg .delete-for-all {
+            font-size: 0.6rem; color: #ef4444; cursor: pointer;
+            margin-right: 8px;
+        }
+        .msg .actions {
+            display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;
+        }
+        .msg .actions button {
+            background: transparent; border: none;
+            color: #94a3b8; font-size: 0.6rem; cursor: pointer;
+            padding: 2px 6px; border-radius: 4px;
+        }
+        .msg .actions button:hover { background: #2d3a4a; }
         #inputArea {
-            display: flex; gap: 10px;
+            display: flex; gap: 10px; flex-wrap: wrap;
             padding: 12px 16px 20px;
             background: #1e293b;
             border-top: 1px solid #2d3a4a;
             padding-bottom: max(20px, env(safe-area-inset-bottom));
+        }
+        #inputArea .input-wrapper {
+            flex: 1; display: flex; gap: 10px; min-width: 200px;
         }
         #inputArea input {
             flex: 1; padding: 12px 18px; border-radius: 50px;
@@ -113,13 +146,19 @@
             font-size: 0.95rem; font-family: inherit; outline: none;
         }
         #inputArea input:focus { border-color: #3b82f6; }
+        #inputArea .btn-group {
+            display: flex; gap: 8px;
+        }
         #inputArea button {
-            padding: 12px 22px; border-radius: 50px;
+            padding: 12px 18px; border-radius: 50px;
             background: #3b82f6; color: #fff; border: none;
             font-weight: 800; cursor: pointer; font-family: inherit;
-            transition: 0.15s;
+            transition: 0.15s; white-space: nowrap;
         }
         #inputArea button:active { transform: scale(0.94); }
+        #inputArea .btn-secondary {
+            background: #334155; color: #fff;
+        }
         .toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: #1e293b; color: #3b82f6; padding: 10px 22px;
@@ -134,10 +173,21 @@
             z-index: 50; pointer-events: none;
         }
         .footer span { color: #3b82f6; }
+        .color-picker {
+            display: flex; gap: 6px; padding: 4px 0;
+        }
+        .color-picker .color-dot {
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid transparent; cursor: pointer;
+            transition: 0.15s;
+        }
+        .color-picker .color-dot.active {
+            border-color: #fff; transform: scale(1.1);
+        }
         @media (max-width: 480px) {
             .loginCard { padding: 24px 16px; }
             .loginCard h1 { font-size: 1.5rem; }
-            #inputArea button { padding: 12px 16px; font-size: 0.85rem; }
+            #inputArea button { padding: 10px 14px; font-size: 0.8rem; }
             #header .room-code { font-size: 0.75rem; }
             .msg { max-width: 90%; font-size: 0.85rem; }
             #messages { padding: 12px 12px 20px; }
@@ -172,8 +222,15 @@
         </div>
         <div id="messages"></div>
         <div id="inputArea">
-            <input id="msgInput" placeholder="پیام خود را بنویس..." />
-            <button id="sendBtn">📤 ارسال</button>
+            <div class="input-wrapper">
+                <input id="msgInput" placeholder="پیام خود را بنویس..." />
+                <button id="sendBtn">📤</button>
+            </div>
+            <div class="btn-group">
+                <button class="btn-secondary" id="voiceBtn" title="پیام صوتی">🎤</button>
+                <button class="btn-secondary" id="fileBtn" title="ارسال فایل">📎</button>
+                <button class="btn-secondary" id="selfDestructBtn" title="ناپدیدشونده">⏳</button>
+            </div>
         </div>
     </div>
 
@@ -196,6 +253,11 @@
         const db = firebase.database();
 
         let roomId = '', userName = '', messagesRef = null;
+        let selfDestruct = false;
+        let replyTo = null;
+        let editMessageId = null;
+        let userColor = '#3b82f6';
+        const defaultColors = ['#3b82f6', '#ef4444', '#22c55e', '#eab308', '#8b5cf6', '#ec4899', '#14b8a6'];
 
         const loginOverlay = document.getElementById('loginOverlay');
         const chatContainer = document.getElementById('chatContainer');
@@ -212,6 +274,9 @@
         const toastEl = document.getElementById('toast');
         const savedUserBox = document.getElementById('savedUserBox');
         const savedUserName = document.getElementById('savedUserName');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const fileBtn = document.getElementById('fileBtn');
+        const selfDestructBtn = document.getElementById('selfDestructBtn');
 
         function showToast(msg) {
             toastEl.textContent = msg;
@@ -262,12 +327,59 @@
             messagesRef.limitToLast(50).on('child_added', function(snapshot) {
                 const data = snapshot.val();
                 if (!data) return;
+                // Check for self-destruct
+                if (data.selfDestruct && data.selfDestruct > 0) {
+                    setTimeout(() => {
+                        messagesRef.child(snapshot.key).remove();
+                    }, data.selfDestruct * 1000);
+                }
                 const div = document.createElement('div');
                 div.className = 'msg ' + (data.name === userName ? 'me' : 'other');
+                if (data.color) {
+                    if (data.name === userName) {
+                        div.style.background = data.color;
+                    } else {
+                        div.style.borderColor = data.color;
+                    }
+                }
                 const time = new Date(data.time).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
-                div.innerHTML = `<div class="sender">${data.name}</div>${data.text}<div class="time">${time}</div>`;
+                let html = `<div class="sender">${data.name}</div>`;
+                if (data.replyTo) {
+                    html += `<div class="reply-to">↩️ پاسخ به: ${data.replyTo}</div>`;
+                }
+                html += data.text;
+                if (data.edited) {
+                    html += `<span class="edit-indicator">✏️ ویرایش شده</span>`;
+                }
+                html += `<div class="time">${time}</div>`;
+                // Reactions
+                if (data.reactions) {
+                    html += `<div class="reactions">`;
+                    for (const [emoji, count] of Object.entries(data.reactions)) {
+                        html += `<span onclick="addReaction('${snapshot.key}', '${emoji}')">${emoji} ${count}</span>`;
+                    }
+                    html += `</div>`;
+                }
+                // Actions
+                html += `<div class="actions">`;
+                if (data.name === userName) {
+                    html += `<button onclick="editMessage('${snapshot.key}')">✏️ ویرایش</button>`;
+                    html += `<button onclick="deleteForAll('${snapshot.key}')">🗑️ حذف برای همه</button>`;
+                }
+                html += `<button onclick="replyToMessage('${snapshot.key}', '${data.name}')">↩️ پاسخ</button>`;
+                html += `</div>`;
+                div.innerHTML = html;
                 messagesDiv.appendChild(div);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                // Desktop notification
+                if (data.name !== userName) {
+                    if (Notification.permission === 'granted') {
+                        new Notification('پیام جدید از ' + data.name, {
+                            body: data.text,
+                            icon: '💬'
+                        });
+                    }
+                }
             });
         }
 
@@ -275,18 +387,91 @@
             const text = msgInput.value.trim();
             if (!text) return;
             if (!roomId || !userName) { showToast('❌ ابتدا وارد چت شو'); return; }
-            messagesRef.push({ name: userName, text: text, time: Date.now() });
+            const msgData = {
+                name: userName,
+                text: text,
+                time: Date.now(),
+                color: userColor
+            };
+            if (selfDestruct) {
+                msgData.selfDestruct = 30; // 30 seconds
+                selfDestruct = false;
+                selfDestructBtn.style.background = '#334155';
+                showToast('⏳ حالت ناپدیدشونده غیرفعال شد');
+            }
+            if (replyTo) {
+                msgData.replyTo = replyTo;
+                replyTo = null;
+            }
+            if (editMessageId) {
+                msgData.edited = true;
+                messagesRef.child(editMessageId).update(msgData);
+                editMessageId = null;
+                sendBtn.textContent = '📤';
+                msgInput.placeholder = 'پیام خود را بنویس...';
+                showToast('✅ ویرایش شد');
+                return;
+            }
+            messagesRef.push(msgData);
             msgInput.value = '';
             msgInput.focus();
         }
 
-        function logout() {
-            if (messagesRef) messagesRef.off();
-            messagesDiv.innerHTML = '';
-            chatContainer.style.display = 'none';
-            loginOverlay.style.display = 'flex';
-            clearSavedUser();
-            showToast('🚪 خارج شدی');
+        function addReaction(msgId, emoji) {
+            const ref = messagesRef.child(msgId + '/reactions/' + emoji);
+            ref.transaction((current) => {
+                return (current || 0) + 1;
+            });
+        }
+
+        function editMessage(msgId) {
+            messagesRef.child(msgId).once('value', (snap) => {
+                const data = snap.val();
+                if (data && data.name === userName) {
+                    msgInput.value = data.text;
+                    editMessageId = msgId;
+                    sendBtn.textContent = '💾 ذخیره';
+                    msgInput.placeholder = 'ویرایش پیام...';
+                    msgInput.focus();
+                    showToast('✏️ در حال ویرایش');
+                }
+            });
+        }
+
+        function deleteForAll(msgId) {
+            if (confirm('پیام برای همه حذف شود؟')) {
+                messagesRef.child(msgId).update({ text: '⚠️ این پیام حذف شده است', deleted: true });
+                showToast('🗑️ حذف شد');
+            }
+        }
+
+        function replyToMessage(msgId, senderName) {
+            replyTo = senderName;
+            msgInput.placeholder = 'پاسخ به ' + senderName + '...';
+            msgInput.focus();
+            showToast('↩️ پاسخ به ' + senderName);
+        }
+
+        // Voice (simulated)
+        voiceBtn.addEventListener('click', () => {
+            showToast('🎤 پیام صوتی (در حال توسعه...)');
+        });
+
+        // File (simulated)
+        fileBtn.addEventListener('click', () => {
+            showToast('📎 ارسال فایل (در حال توسعه...)');
+        });
+
+        // Self-destruct toggle
+        selfDestructBtn.addEventListener('click', () => {
+            selfDestruct = !selfDestruct;
+            selfDestructBtn.style.background = selfDestruct ? '#ef4444' : '#334155';
+            showToast(selfDestruct ? '⏳ حالت ناپدیدشونده فعال شد' : '⏳ حالت ناپدیدشونده غیرفعال شد');
+        });
+
+        // Desktop notification permission
+        if ('Notification' in window) {
+            Notification.requestPermission();
         }
 
         joinBtn.addEventListener('click', joinChat);
@@ -294,10 +479,10 @@
         roomInput.addEventListener('keydown', e => { if (e.key === 'Enter') nameInput.focus(); });
         sendBtn.addEventListener('click', sendMessage);
         msgInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
-        logoutBtn.addEventListener('click', logout);
-        headerLogoutBtn.addEventListener('click', logout);
-        loadSavedUser();
+        logoutBtn.addEventListener('click', () => { if (messagesRef) messagesRef.off(); messagesDiv.innerHTML = ''; chatContainer.style.display = 'none'; loginOverlay.style.display = 'flex'; clearSavedUser(); showToast('🚪 خارج شدی'); });
+        headerLogoutBtn.addEventListener('click', () => { if (messagesRef) messagesRef.off(); messagesDiv.innerHTML = ''; chatContainer.style.display = 'none'; loginOverlay.style.display = 'flex'; clearSavedUser(); showToast('🚪 خارج شدی'); });
 
+        loadSavedUser();
         console.log('💬 گپ خصوصی آماده است!');
         console.log('🔑 کد اتاق: FAMILY2025');
     </script>
