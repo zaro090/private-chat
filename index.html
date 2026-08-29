@@ -372,12 +372,10 @@
             }
             #messages {
                 padding: 12px 12px 20px;
-                /* فاصله از پایین */
                 padding-bottom: 20px;
             }
             #inputArea {
                 padding: 10px 12px 20px;
-                /* فاصله از پایین */
             }
         }
     </style>
@@ -542,7 +540,6 @@
                     html += `<div class="reply-to">↩️ پاسخ به: ${data.replyTo}</div>`;
                 }
 
-                // نمایش فایل
                 if (data.file) {
                     if (data.file.type.startsWith('image/')) {
                         html +=
