@@ -16,7 +16,7 @@
         body {
             font-family: 'Vazirmatn', sans-serif;
             background: #0f172a;
-            color: #e2e8f0;
+            color: #f1f5f9;
             height: 100vh;
             overflow: hidden;
             touch-action: manipulation;
@@ -153,14 +153,15 @@
         }
         .msg.me {
             align-self: flex-end;
-            background: linear-gradient(135deg, #f5b81b, #e6a800);
-            color: #0f172a;
+            background: #3b82f6;
+            color: #ffffff;
             border-bottom-right-radius: 4px;
         }
         .msg.other {
             align-self: flex-start;
             background: #1e293b;
             border: 1px solid #334155;
+            color: #f1f5f9;
             border-bottom-left-radius: 4px;
         }
         .msg .sender {
@@ -169,14 +170,14 @@
             color: #94a3b8;
             margin-bottom: 2px;
         }
-        .msg.me .sender { color: #0f172a; opacity: 0.7; }
+        .msg.me .sender { color: #bfdbfe; }
         .msg .time {
             font-size: 0.6rem;
             color: #64748b;
             margin-top: 4px;
             text-align: left;
         }
-        .msg.me .time { color: #0f172a; opacity: 0.6; }
+        .msg.me .time { color: #bfdbfe; opacity: 0.8; }
         .msg .reactions {
             display: flex;
             gap: 4px;
@@ -199,7 +200,7 @@
             padding: 4px 8px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
-            border-right: 2px solid #f5b81b;
+            border-right: 2px solid #3b82f6;
         }
         .msg .edit-indicator {
             font-size: 0.6rem;
@@ -248,7 +249,7 @@
             font-family: inherit;
             outline: none;
         }
-        #inputArea input:focus { border-color: #f5b81b; }
+        #inputArea input:focus { border-color: #3b82f6; }
         #inputArea .btn-group {
             display: flex;
             gap: 8px;
@@ -256,8 +257,8 @@
         #inputArea button {
             padding: 12px 18px;
             border-radius: 50px;
-            background: linear-gradient(135deg, #f5b81b, #e6a800);
-            color: #0f172a;
+            background: #3b82f6;
+            color: #ffffff;
             border: none;
             font-weight: 800;
             cursor: pointer;
@@ -374,7 +375,7 @@
         let selfDestruct = false;
         let replyTo = null;
         let editMessageId = null;
-        let userColor = '#f5b81b';
+        let userColor = '#3b82f6';
 
         const loginOverlay = document.getElementById('loginOverlay');
         const chatContainer = document.getElementById('chatContainer');
