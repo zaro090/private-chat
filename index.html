@@ -42,7 +42,10 @@
             text-align: center;
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
         }
-        .loginCard .logo { font-size: 3rem; margin-bottom: 10px; }
+        .loginCard .logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
         .loginCard h1 {
             color: #f5b81b;
             font-size: 1.8rem;
@@ -86,9 +89,17 @@
             font-family: inherit;
             box-shadow: 0 6px 20px rgba(245, 184, 27, 0.25);
         }
-        .loginCard .btn-primary:active { transform: scale(0.96); }
-        .loginCard .saved-user { color: #94a3b8; font-size: 0.85rem; margin: 12px 0; }
-        .loginCard .saved-user strong { color: #f5b81b; }
+        .loginCard .btn-primary:active {
+            transform: scale(0.96);
+        }
+        .loginCard .saved-user {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin: 12px 0;
+        }
+        .loginCard .saved-user strong {
+            color: #f5b81b;
+        }
         .loginCard .logout-btn {
             background: transparent;
             border: 1px solid #ef4444;
@@ -101,7 +112,10 @@
             margin-top: 6px;
             display: none;
         }
-        .loginCard .logout-btn:hover { background: #ef4444; color: #fff; }
+        .loginCard .logout-btn:hover {
+            background: #ef4444;
+            color: #fff;
+        }
         #chatContainer {
             display: none;
             height: 100vh;
@@ -119,8 +133,15 @@
             gap: 6px;
             padding-top: max(14px, env(safe-area-inset-top));
         }
-        #header .room-code { color: #f5b81b; font-size: 0.9rem; font-weight: 700; }
-        #header .user-name { color: #94a3b8; font-size: 0.8rem; }
+        #header .room-code {
+            color: #f5b81b;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        #header .user-name {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
         #header .logout-btn {
             background: transparent;
             border: 1px solid #ef4444;
@@ -170,14 +191,31 @@
             color: #94a3b8;
             margin-bottom: 2px;
         }
-        .msg.me .sender { color: #bfdbfe; }
+        .msg.me .sender {
+            color: #bfdbfe;
+        }
         .msg .time {
             font-size: 0.6rem;
             color: #64748b;
             margin-top: 4px;
             text-align: left;
         }
-        .msg.me .time { color: #bfdbfe; opacity: 0.8; }
+        .msg.me .time {
+            color: #bfdbfe;
+            opacity: 0.8;
+        }
+        .msg .file-preview {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 10px;
+            margin-top: 4px;
+            cursor: pointer;
+        }
+        .msg .file-name {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
         .msg .reactions {
             display: flex;
             gap: 4px;
@@ -192,7 +230,9 @@
             cursor: pointer;
             transition: 0.1s;
         }
-        .msg .reactions span:hover { transform: scale(1.1); }
+        .msg .reactions span:hover {
+            transform: scale(1.1);
+        }
         .msg .reply-to {
             font-size: 0.7rem;
             color: #94a3b8;
@@ -222,7 +262,9 @@
             padding: 2px 6px;
             border-radius: 4px;
         }
-        .msg .actions button:hover { background: #2d3a4a; }
+        .msg .actions button:hover {
+            background: #2d3a4a;
+        }
         #inputArea {
             display: flex;
             gap: 10px;
@@ -249,7 +291,9 @@
             font-family: inherit;
             outline: none;
         }
-        #inputArea input:focus { border-color: #3b82f6; }
+        #inputArea input:focus {
+            border-color: #3b82f6;
+        }
         #inputArea .btn-group {
             display: flex;
             gap: 8px;
@@ -266,10 +310,15 @@
             transition: 0.15s;
             white-space: nowrap;
         }
-        #inputArea button:active { transform: scale(0.94); }
+        #inputArea button:active {
+            transform: scale(0.94);
+        }
         #inputArea .btn-secondary {
             background: #334155;
             color: #e2e8f0;
+        }
+        #fileInput {
+            display: none;
         }
         .toast {
             position: fixed;
@@ -300,15 +349,36 @@
             z-index: 50;
             pointer-events: none;
         }
-        .footer span { color: #f5b81b; }
+        .footer span {
+            color: #f5b81b;
+        }
         @media (max-width: 480px) {
-            .loginCard { padding: 24px 16px; }
-            .loginCard h1 { font-size: 1.5rem; }
-            #inputArea button { padding: 10px 14px; font-size: 0.8rem; }
-            #header .room-code { font-size: 0.75rem; }
-            .msg { max-width: 90%; font-size: 0.85rem; }
-            #messages { padding: 12px 12px 20px; }
-            #inputArea { padding: 10px 12px 20px; }
+            .loginCard {
+                padding: 24px 16px;
+            }
+            .loginCard h1 {
+                font-size: 1.5rem;
+            }
+            #inputArea button {
+                padding: 10px 14px;
+                font-size: 0.8rem;
+            }
+            #header .room-code {
+                font-size: 0.75rem;
+            }
+            .msg {
+                max-width: 90%;
+                font-size: 0.85rem;
+            }
+            #messages {
+                padding: 12px 12px 20px;
+                /* فاصله از پایین */
+                padding-bottom: 20px;
+            }
+            #inputArea {
+                padding: 10px 12px 20px;
+                /* فاصله از پایین */
+            }
         }
     </style>
 </head>
@@ -357,6 +427,8 @@
 
     <div id="toast" class="toast"></div>
 
+    <input type="file" id="fileInput" multiple>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBV_HPvDFrG7npGtDfA8wrk0XRtq4s5c4k",
@@ -395,6 +467,7 @@
         const voiceBtn = document.getElementById('voiceBtn');
         const fileBtn = document.getElementById('fileBtn');
         const selfDestructBtn = document.getElementById('selfDestructBtn');
+        const fileInput = document.getElementById('fileInput');
 
         function showToast(msg) {
             toastEl.textContent = msg;
@@ -464,10 +537,25 @@
                 }
                 const time = new Date(data.time).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
                 let html = `<div class="sender">${data.name}</div>`;
+
                 if (data.replyTo) {
                     html += `<div class="reply-to">↩️ پاسخ به: ${data.replyTo}</div>`;
                 }
-                html += data.text;
+
+                // نمایش فایل
+                if (data.file) {
+                    if (data.file.type.startsWith('image/')) {
+                        html +=
+                            `<img src="${data.file.data}" class="file-preview" onclick="window.open('${data.file.data}','_blank')" />`;
+                    } else {
+                        html += `<div class="file-name">📎 ${data.file.name}</div>`;
+                        html +=
+                            `<a href="${data.file.data}" download="${data.file.name}" style="color:#3b82f6;font-size:0.8rem;">⬇️ دانلود</a>`;
+                    }
+                }
+
+                html += data.text || '';
+
                 if (data.edited) {
                     html += `<span class="edit-indicator">✏️ ویرایش شده</span>`;
                 }
@@ -492,7 +580,7 @@
                 if (data.name !== userName) {
                     if (Notification.permission === 'granted') {
                         new Notification('پیام جدید از ' + data.name, {
-                            body: data.text,
+                            body: data.text || '📎 فایل',
                             icon: '💬'
                         });
                     }
@@ -534,6 +622,34 @@
             msgInput.focus();
         }
 
+        function sendFile(file) {
+            if (!roomId || !userName) { showToast('❌ ابتدا وارد چت شو'); return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fileData = {
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: e.target.result
+                };
+                const msgData = {
+                    name: userName,
+                    file: fileData,
+                    time: Date.now(),
+                    color: userColor
+                };
+                if (selfDestruct) {
+                    msgData.selfDestruct = 30;
+                    selfDestruct = false;
+                    selfDestructBtn.style.background = '#334155';
+                    showToast('⏳ حالت ناپدیدشونده غیرفعال شد');
+                }
+                messagesRef.push(msgData);
+                showToast('📎 فایل ارسال شد');
+            };
+            reader.readAsDataURL(file);
+        }
+
         function addReaction(msgId, emoji) {
             const ref = messagesRef.child(msgId + '/reactions/' + emoji);
             ref.transaction((current) => {
@@ -545,7 +661,7 @@
             messagesRef.child(msgId).once('value', (snap) => {
                 const data = snap.val();
                 if (data && data.name === userName) {
-                    msgInput.value = data.text;
+                    msgInput.value = data.text || '';
                     editMessageId = msgId;
                     sendBtn.textContent = '💾 ذخیره';
                     msgInput.placeholder = 'ویرایش پیام...';
@@ -574,7 +690,15 @@
         });
 
         fileBtn.addEventListener('click', () => {
-            showToast('📎 ارسال فایل (در حال توسعه...)');
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function(e) {
+            const files = e.target.files;
+            for (let i = 0; i < files.length; i++) {
+                sendFile(files[i]);
+            }
+            fileInput.value = '';
         });
 
         selfDestructBtn.addEventListener('click', () => {
@@ -606,7 +730,7 @@
             showToast('🚪 خارج شدی'); });
 
         loadSavedUser();
-        console.log('💬 گپ خصوصی آماده است!');
+        console.log('💬 گپ خصوصی با ارسال فایل آماده است!');
         console.log('🔑 کد اتاق: FAMILY2025');
     </script>
 </body>
