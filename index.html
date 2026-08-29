@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>گپ خصوصی</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.4/Vazirmatn-font-face.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: #0b1220;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #loginOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
+            padding: 24px;
+        }
+        .loginCard {
+            background: #1e293b;
+            border-radius: 32px;
+            padding: 40px 28px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid #334155;
+            text-align: center;
+        }
+        .loginCard h1 {
+            color: #f5c542;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        .loginCard p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+        .loginCard input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .loginCard input:focus {
+            border-color: #f5c542;
+            outline: none;
+        }
+        .loginCard button {
+            width: 100%;
+            padding: 16px;
+            background: #f5c542;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        #chatContainer {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+        #header {
+            background: #1e293b;
+            padding: 14px 18px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #header .room-code {
+            color: #f5c542;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        #header .user-name {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .msg {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+        }
+        .msg.me {
+            align-self: flex-end;
+            background: #f5c542;
+            color: #000;
+            border-bottom-right-radius: 4px;
+        }
+        .msg.other {
+            align-self: flex-start;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-bottom-left-radius: 4px;
+        }
+        .msg .sender {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-bottom: 2px;
+        }
+        .msg .time {
+            font-size: 0.6rem;
+            color: #64748b;
+            margin-top: 4px;
+            text-align: left;
+        }
+        #inputArea {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #1e293b;
+            border-top: 1px solid #334155;
+        }
+        #inputArea input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 50px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #fff;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+        }
+        #inputArea input:focus {
+            border-color: #f5c542;
+        }
+        #inputArea button {
+            padding: 12px 24px;
+            border-radius: 50px;
+            background: #f5c542;
+            color: #000;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #f5c542;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            z-index: 999;
+            display: none;
+            border: 1px solid #f5c542;
+            backdrop-filter: blur(10px);
+        }
+        @media (max-width: 480px) {
+            .loginCard {
+                padding: 28px 18px;
+            }
+            .loginCard h1 {
+                font-size: 1.6rem;
+            }
+            #inputArea button {
+                padding: 12px 18px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loginOverlay">
+        <div class="loginCard">
+            <h1>💬 گپ خصوصی</h1>
+            <p>با کد اتاق وارد شو</p>
+            <input id="roomInput" placeholder="کد اتاق (مثلاً ABC123)" value="FAMILY2025">
+            <input id="nameInput" placeholder="نام شما...">
+            <button id="joinBtn">🚀 ورود به چت</button>
+        </div>
+    </div>
+
+    <div id="chatContainer">
+        <div id="header">
+            <div>
+                <span class="room-code" id="roomDisplay">📌 FAMILY2025</span>
+            </div>
+            <div>
+                <span class="user-name" id="userDisplay">👤 مهمان</span>
+            </div>
+        </div>
+        <div id="messages"></div>
+        <div id="inputArea">
+            <input id="msgInput" placeholder="پیام خود را بنویس..." />
+            <button id="sendBtn">📤 ارسال</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ===== Firebase =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyBV_HPvDFrG7npGtDfA8wrk0XRtq4s5c4k",
+            authDomain: "location-tracker-e732b.firebaseapp.com",
+            projectId: "location-tracker-e732b",
+            storageBucket: "location-tracker-e732b.firebasestorage.app",
+            messagingSenderId: "425589009128",
+            appId: "1:425589009128:web:759e3b6b614434eb75775d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ===== متغیرها =====
+        let roomId = '';
+        let userName = '';
+        let messagesRef = null;
+
+        const loginOverlay = document.getElementById('loginOverlay');
+        const chatContainer = document.getElementById('chatContainer');
+        const roomInput = document.getElementById('roomInput');
+        const nameInput = document.getElementById('nameInput');
+        const joinBtn = document.getElementById('joinBtn');
+        const msgInput = document.getElementById('msgInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messagesDiv = document.getElementById('messages');
+        const roomDisplay = document.getElementById('roomDisplay');
+        const userDisplay = document.getElementById('userDisplay');
+        const toastEl = document.getElementById('toast');
+
+        function showToast(msg) {
+            toastEl.textContent = msg;
+            toastEl.style.display = 'block';
+            clearTimeout(toastEl._timer);
+            toastEl._timer = setTimeout(() => { toastEl.style.display = 'none'; }, 2500);
+        }
+
+        function joinChat() {
+            const room = roomInput.value.trim().toUpperCase();
+            const name = nameInput.value.trim();
+            if (!room || room.length < 4) { showToast('❌ کد اتاق حداقل ۴ کاراکتر'); return; }
+            if (!name || name.length < 2) { showToast('❌ نام خود را وارد کن'); return; }
+
+            roomId = room;
+            userName = name;
+            loginOverlay.style.display = 'none';
+            chatContainer.style.display = 'flex';
+            roomDisplay.textContent = '📌 ' + roomId;
+            userDisplay.textContent = '👤 ' + userName;
+
+            messagesRef = db.ref('chats/' + roomId + '/messages');
+            loadMessages();
+            showToast('✅ وارد چت شدی');
+        }
+
+        function loadMessages() {
+            messagesRef.off();
+            messagesRef.limitToLast(50).on('child_added', function(snapshot) {
+                const data = snapshot.val();
+                if (!data) return;
+                const div = document.createElement('div');
+                div.className = 'msg ' + (data.name === userName ? 'me' : 'other');
+                const time = new Date(data.time).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+                div.innerHTML = `
+                    <div class="sender">${data.name}</div>
+                    ${data.text}
+                    <div class="time">${time}</div>
+                `;
+                messagesDiv.appendChild(div);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            });
+        }
+
+        function sendMessage() {
+            const text = msgInput.value.trim();
+            if (!text) return;
+            if (!roomId || !userName) { showToast('❌ ابتدا وارد چت شو'); return; }
+            messagesRef.push({
+                name: userName,
+                text: text,
+                time: Date.now()
+            });
+            msgInput.value = '';
+            msgInput.focus();
+        }
+
+        joinBtn.addEventListener('click', joinChat);
+        nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') joinChat(); });
+        roomInput.addEventListener('keydown', e => { if (e.key === 'Enter') nameInput.focus(); });
+        sendBtn.addEventListener('click', sendMessage);
+        msgInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+        console.log('💬 گپ خصوصی آماده است!');
+        console.log('🔑 کد اتاق پیش‌فرض: FAMILY2025');
+    </script>
+</body>
+</html>
